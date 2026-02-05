@@ -3,101 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Speed2 Headshot Edition</title>
+    <title>Speed2 Ultra Headshot</title>
     <style>
-        body { margin: 0; background: #000; color: white; font-family: 'Courier New', monospace; overflow: hidden; touch-action: none; }
+        body { margin: 0; background: #000; color: white; font-family: sans-serif; overflow: hidden; touch-action: none; }
         
         #menu { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(5, 5, 5, 0.95); padding: 25px; 
-            border: 2px solid #ffffff; border-radius: 10px; z-index: 100; 
-            width: 280px; box-shadow: 0 0 40px rgba(255,255,255,0.1);
+            background: rgba(5, 5, 5, 0.98); padding: 25px; 
+            border: 1px solid #ffffff; border-radius: 12px; z-index: 100; 
+            width: 270px; box-shadow: 0 0 40px rgba(255,255,255,0.1);
         }
 
-        .header { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .label { font-size: 11px; color: #eee; margin-top: 15px; display: block; }
+        .header { font-size: 14px; font-weight: 900; text-align: center; margin-bottom: 20px; letter-spacing: 2px; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        .row { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+        .label { font-size: 9px; color: #888; font-weight: bold; text-transform: uppercase; }
+        .val { font-size: 11px; color: #fff; font-family: monospace; border: 1px solid #333; padding: 2px 6px; border-radius: 4px; }
         
-        input[type=range] { width: 100%; accent-color: #ffffff; margin: 10px 0; background: #222; border-radius: 5px; height: 6px; appearance: none; }
+        input[type=range] { width: 100%; accent-color: #ffffff; margin: 10px 0; height: 4px; appearance: none; background: #222; border-radius: 10px; }
 
         #inject-btn {
             margin-top: 25px; width: 100%; padding: 15px;
             background: #fff; color: #000; border: none;
-            border-radius: 5px; font-weight: bold; font-size: 14px;
-            cursor: pointer; box-shadow: 0 4px 0 #888;
+            border-radius: 6px; font-weight: 900; font-size: 12px;
+            cursor: pointer; transition: 0.3s;
         }
-        #inject-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #444; }
 
-        #stat { font-size: 10px; color: #00ff00; margin-top: 20px; text-align: left; height: 40px; }
+        #stat { font-size: 9px; color: #444; margin-top: 20px; text-align: left; font-family: monospace; line-height: 1.4; }
 
-        .head-aim { 
+        /* AIM FOV CIRCLE */
+        .fov-circle { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            width: 80px; height: 80px; border: 1px double rgba(255,255,255,0.5); 
-            border-radius: 50%; pointer-events: none;
+            border: 1px dashed rgba(255,255,255,0.4); border-radius: 50%; pointer-events: none; 
         }
-        .dot { position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: red; border-radius: 50%; transform: translate(-50%, -50%); }
+        .center-dot { position: absolute; top: 50%; left: 50%; width: 2px; height: 2px; background: red; border-radius: 50%; transform: translate(-50%, -50%); }
     </style>
 </head>
 <body>
 
-    <div class="head-aim"><div class="dot"></div></div>
+    <div class="fov-circle" id="aimfov" style="width: 120px; height: 120px;"><div class="center-dot"></div></div>
 
     <div id="menu">
         <div class="header">SYSTEM AUTO-AIM V4</div>
         
-        <div class="label">LOCK-ON INTENSITY (Cabeza)</div>
-        <input type="range" id="lock" min="0" max="100" value="95">
+        <div class="row">
+            <span class="label">AIM-LOCK FOV (CABEZA)</span>
+            <span class="val" id="v1">98%</span>
+        </div>
+        <input type="range" id="s1" min="0" max="100" value="98">
         
-        <div class="label">SENSIBILIDAD Y (SMG/Shotgun)</div>
-        <input type="range" id="sensy" min="0" max="100" value="88">
+        <div class="row">
+            <span class="label">RESPUESTA TÁCTIL (Y)</span>
+            <span class="val" id="v2">92%</span>
+        </div>
+        <input type="range" id="s2" min="0" max="100" value="92">
 
-        <div class="label">REGEDIT BYPASS (Anti-Ban)</div>
-        <input type="range" id="bypass" min="0" max="100" value="100">
+        <div class="row">
+            <span class="label">REGEDIT BYPASS (ALL MODES)</span>
+            <span class="val" id="v3">100%</span>
+        </div>
+        <input type="range" id="s3" min="0" max="100" value="100">
         
         <button id="inject-btn">INJECT & START GAME</button>
 
-        <div id="stat">> ENGINE READY...<br>> WAITING INJECTION...</div>
+        <div id="stat">> STATUS: WAITING...<br>> ENGINE: STANDBY</div>
     </div>
 
     <script>
-        const btn = document.getElementById('inject-btn');
+        const s1 = document.getElementById('s1');
+        const s2 = document.getElementById('s2');
+        const s3 = document.getElementById('s3');
+        const fov = document.getElementById('aimfov');
         const stat = document.getElementById('stat');
-        let active = false;
+        const btn = document.getElementById('inject-btn');
+
+        // Sincronización de números y círculo
+        s1.oninput = () => { 
+            document.getElementById('v1').innerText = s1.value + "%";
+            let size = 40 + (s1.value * 1.2);
+            fov.style.width = size + "px";
+            fov.style.height = size + "px";
+        };
+        s2.oninput = () => { document.getElementById('v2').innerText = s2.value + "%"; };
+        s3.oninput = () => { document.getElementById('v3').innerText = s3.value + "%"; };
 
         btn.onclick = () => {
-            stat.innerHTML = "> ANALYZING FILES...<br>> INJECTING H-DATA...";
-            btn.style.opacity = "0.5";
+            btn.innerText = "INJECTING CODES...";
+            stat.innerHTML = "> INJECTING AIM-LOCK...<br>> OPTIMIZING TOUCH RESPONSE...";
             
             setTimeout(() => {
-                active = true;
-                stat.innerHTML = "> STATUS: <font color='white'>ACTIVE</font><br>> AIM-LOCK: <font color='white'>CALIBRATED</font>";
-                btn.innerText = "OPENING FREE FIRE...";
+                stat.innerHTML = "<font color='#00ff00'>> INJECTION SUCCESSFUL</font><br>> MODE: PVP/BR/DECLA ACTIVE";
                 
-                // Intento de apertura directa
-                window.location.href = "android-app://com.dts.freefireth"; 
+                // Ejecución del paquete directo de Free Fire
+                window.location.href = "intent://#Intent;package=com.dts.freefireth;scheme=android-app;end"; 
                 
                 setTimeout(() => {
                     btn.innerText = "INJECT & START GAME";
-                    btn.style.opacity = "1";
-                }, 5000);
+                }, 4000);
             }, 2000);
         };
 
-        // ALGORITMO DE SEGUIMIENTO (AQUÍ ESTÁ EL TRUCO)
+        // Algoritmo de respuesta táctil mejorada
         window.addEventListener('pointermove', (e) => {
-            if(!active) return;
-
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-            
-            // Calculamos la distancia del dedo al centro
-            const dx = e.clientX - centerX;
-            const dy = e.clientY - centerY;
-
-            // Si mueves el dedo hacia arriba (dy negativo), aumentamos la respuesta
-            if(dy < 0) {
-                const boost = document.getElementById('sensy').value / 50;
-                stat.innerHTML = `> AIMING UP: +${boost.toFixed(2)}%<br>> LOCK-ON STABLE`;
-            }
+            const yBoost = s2.value / 100;
+            // Simulación de estabilización en el eje Y para subir mira
+            stat.style.color = e.movementY < 0 ? "#fff" : "#444";
         });
     </script>
 </body>

@@ -3,64 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Speed2 Ultra Headshot</title>
+    <title>CRISQZY - KING SENSI</title>
     <style>
-        body { margin: 0; background: #000; color: white; font-family: sans-serif; overflow: hidden; touch-action: none; }
-        #menu { 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; 
+            font-family: Arial, sans-serif; background: #05000b; color: #fff; position: relative; 
+        }
+
+        /* Efecto Lluvia Estilo King Sensi */
+        .rain { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+        .drop { 
+            position: absolute; width: 2px; height: 18px; 
+            background: linear-gradient(#c4b5fd, #8b5cf6); 
+            border-radius: 999px; opacity: 0.4; animation: fall 3s linear infinite; 
+        }
+        @keyframes fall { 
+            0% { transform: translateY(-110vh); opacity: 0; }
+            100% { transform: translateY(110vh); opacity: 0; } 
+        }
+
+        /* Tarjeta Principal Personalizada */
+        .card { 
+            position: relative; z-index: 1; width: 380px; max-width: 90vw; 
+            background: rgba(5, 5, 9, 0.95); border-radius: 20px; padding: 25px; 
+            box-shadow: 0 30px 80px rgba(0,0,0,0.9); border: 1px solid #111827; 
+            text-align: center;
+        }
+
+        .brand { font-size: 10px; color: #8b5cf6; letter-spacing: 3px; font-weight: bold; margin-bottom: 5px; }
+        h1 { 
+            font-size: 28px; margin-bottom: 20px; 
+            background: linear-gradient(135deg, #8b5cf6, #ffffff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900;
+        }
+
+        .section { background: #06060b; border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid #111827; text-align: left; }
+        .label { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+        
+        input[type=range] { width: 100%; accent-color: #8b5cf6; margin: 10px 0; }
+        .val { float: right; color: #fff; font-weight: bold; }
+
+        .btn-inject { 
+            width: 100%; padding: 15px; border-radius: 10px; 
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed); border: none;
+            color: #fff; font-weight: 900; cursor: pointer; 
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.4); text-transform: uppercase;
+            margin-bottom: 15px; transition: 0.3s;
+        }
+        .btn-inject:active { transform: scale(0.95); }
+
+        .btn-game { 
+            width: 48%; padding: 12px; border-radius: 8px; border: 1px solid #1f2937; 
+            color: #fff; font-size: 11px; font-weight: bold; cursor: pointer;
+            background: #111827; transition: 0.2s;
+        }
+        .btn-game:hover { background: #1f2937; border-color: #8b5cf6; }
+
+        #stat { font-size: 10px; color: #22c55e; margin-top: 20px; font-family: monospace; letter-spacing: 1px; }
+        
+        .fov-dot {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(5, 5, 5, 0.98); padding: 25px; 
-            border: 1px solid #ffffff; border-radius: 12px; z-index: 100; 
-            width: 270px; box-shadow: 0 0 40px rgba(255,255,255,0.1);
+            border: 1px dashed rgba(255, 255, 255, 0.2); border-radius: 50%; pointer-events: none;
         }
-        .header { font-size: 14px; font-weight: 900; text-align: center; margin-bottom: 20px; letter-spacing: 2px; border-bottom: 1px solid #222; padding-bottom: 10px; }
-        .row { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
-        .label { font-size: 9px; color: #888; font-weight: bold; text-transform: uppercase; }
-        .val { font-size: 11px; color: #fff; font-family: monospace; border: 1px solid #333; padding: 2px 6px; border-radius: 4px; }
-        input[type=range] { width: 100%; accent-color: #ffffff; margin: 10px 0; height: 4px; appearance: none; background: #222; border-radius: 10px; }
-        #inject-btn {
-            margin-top: 25px; width: 100%; padding: 15px;
-            background: #fff; color: #000; border: none;
-            border-radius: 6px; font-weight: 900; font-size: 12px;
-            cursor: pointer;
-        }
-        #stat { font-size: 9px; color: #444; margin-top: 20px; text-align: left; font-family: monospace; }
-        .fov-circle { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            border: 1px dashed rgba(255,255,255,0.4); border-radius: 50%; pointer-events: none; 
-        }
-        .center-dot { position: absolute; top: 50%; left: 50%; width: 2px; height: 2px; background: red; border-radius: 50%; transform: translate(-50%, -50%); }
     </style>
 </head>
 <body>
-    <div class="fov-circle" id="aimfov" style="width: 120px; height: 120px;"><div class="center-dot"></div></div>
-    <div id="menu">
-        <div class="header">SYSTEM AUTO-AIM V4</div>
-        <div class="row"><span class="label">AIM-LOCK FOV</span><span class="val" id="v1">98%</span></div>
-        <input type="range" id="s1" min="0" max="100" value="98">
-        <div class="row"><span class="label">RESPUESTA TÁCTIL</span><span class="val" id="v2">92%</span></div>
-        <input type="range" id="s2" min="0" max="100" value="92">
-        <div class="row"><span class="label">REGEDIT BYPASS</span><span class="val" id="v3">100%</span></div>
-        <input type="range" id="s3" min="0" max="100" value="100">
-        <button id="inject-btn" onclick="startInjection()">INJECT & START GAME</button>
-        <div id="stat">> STATUS: READY<br>> ENGINE: CALIBRATED</div>
+
+    <div class="rain" id="rainBox"></div>
+    <div class="fov-dot" id="aim" style="width: 130px; height: 130px;"></div>
+
+    <div class="card">
+        <div class="brand">BY CRISQZY</div>
+        <h1>KING SENSI</h1>
+
+        <div class="section">
+            <span class="label">HEAD TRICK (Aura) <span class="val" id="v1">92%</span></span>
+            <input type="range" id="s1" min="0" max="100" value="92">
+            
+            <span class="label">NEURAL AIM TACTIL <span class="val" id="v2">98%</span></span>
+            <input type="range" id="s2" min="0" max="100" value="98">
+        </div>
+
+        <button class="btn-inject" onclick="run()">⚡ INJETAR BY CRISQZY</button>
+
+        <div style="display: flex; justify-content: space-between;">
+            <button class="btn-game" onclick="go('com.dts.freefireth')">FF NORMAL</button>
+            <button class="btn-game" onclick="go('com.dts.freefiremax')">FF MAX</button>
+        </div>
+
+        <div id="stat">SISTEMA ATIVO | BY CRISQZY</div>
     </div>
+
     <script>
-        const s1 = document.getElementById('s1'), s2 = document.getElementById('s2'), s3 = document.getElementById('s3');
-        const fov = document.getElementById('aimfov'), stat = document.getElementById('stat'), btn = document.getElementById('inject-btn');
+        // Lluvia King Sensi
+        const box = document.getElementById('rainBox');
+        for (let i = 0; i < 20; i++) {
+            const d = document.createElement('div');
+            d.className = 'drop';
+            d.style.left = Math.random() * 100 + '%';
+            d.style.animationDelay = Math.random() * 2 + 's';
+            box.appendChild(d);
+        }
 
-        s1.oninput = () => { document.getElementById('v1').innerText = s1.value + "%"; fov.style.width = (40 + (s1.value * 1.2)) + "px"; fov.style.height = fov.style.width; };
+        const s1 = document.getElementById('s1'), s2 = document.getElementById('s2'), aim = document.getElementById('aim');
+
+        s1.oninput = () => {
+            document.getElementById('v1').innerText = s1.value + "%";
+            aim.style.width = (60 + parseInt(s1.value)) + "px";
+            aim.style.height = aim.style.width;
+        };
         s2.oninput = () => { document.getElementById('v2').innerText = s2.value + "%"; };
-        s3.oninput = () => { document.getElementById('v3').innerText = s3.value + "%"; };
 
-        function startInjection() {
-            btn.innerText = "INJECTING...";
-            stat.innerHTML = "> INJECTING AIM-LOCK...<br>> OPTIMIZING TOUCH RESPONSE...";
+        function run() {
+            const b = document.querySelector('.btn-inject');
+            b.innerText = "INJETANDO...";
             setTimeout(() => {
-                stat.innerHTML = "<font color='#0ff'>[SUCCESS] BYPASS ACTIVE</font><br>> LAUNCHING FREE FIRE...";
-                // LA ORDEN MAESTRA PARA ABRIR EL JUEGO DIRECTO
-                window.location.href = "intent://#Intent;package=com.dts.freefireth;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end";
+                b.innerText = "INJETADO POR CRISQZY ✅";
+                document.getElementById('stat').style.color = "#fff";
+                document.getElementById('stat').innerText = "> REGEDIT ATIVA PARA PVP";
             }, 1500);
+        }
+
+        function go(pkg) {
+            // Launcher directo para Redmi
+            window.location.href = `intent://#Intent;package=${pkg};action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end`;
         }
     </script>
 </body>
-</html>
+        </html>
+    
